@@ -1,94 +1,57 @@
-import Image from "next/image";
+"use client";
 import styles from "./page.module.css";
+import { Product, useProducts } from "../hooks/products";
+import Card from "../components/molecules/Card";
+import Logo from "../components/molecules/Logo";
+import { SetStateAction, useState } from "react";
+import CategoryPills from "@/components/molecules/CategoryPills";
+import Title from "@/components/molecules/Title";
+import CardSkeleton from "@/components/molecules/CardSkeleton";
+import ErrorComponent from "@/components/molecules/NetworkError";
+
+const CATEGORIES = [
+  "all",
+  "men's clothing",
+  "jewelery",
+  "electronics",
+  "women's clothing",
+];
 
 export default function Home() {
+  const { data: products, error, isLoading } = useProducts();
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const handleCategorySelect = (category: SetStateAction<string>) => {
+    setSelectedCategory(category);
+  };
+
+  const filteredProducts =
+    selectedCategory === "all"
+      ? products
+      : products?.filter(
+          (product: Product) => product.category === selectedCategory
+        );
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
       <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+        <Logo />
       </div>
-
+      <Title text="Welcome to the Fake Store" />
+      <CategoryPills
+        categories={CATEGORIES}
+        selectedCategory={selectedCategory}
+        onSelectCategory={handleCategorySelect}
+      />
+      {error && <ErrorComponent message={error.message} />}
       <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        {isLoading
+          ? Array(12)
+              .fill(null)
+              .map((_, i) => <CardSkeleton key={i} />)
+          : filteredProducts?.map((product: Product) => (
+              <Card key={product.id} product={product} />
+            ))}
       </div>
     </main>
   );
