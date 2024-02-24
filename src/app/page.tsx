@@ -17,6 +17,8 @@ const CATEGORIES = [
   "women's clothing",
 ];
 
+const SKELETON_CARDS_ARRAY = Array(12).fill(null);
+
 export default function Home() {
   const { data: products, error, isLoading } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -46,9 +48,7 @@ export default function Home() {
       {error && <ErrorComponent message={error.message} />}
       <div className={styles.grid}>
         {isLoading
-          ? Array(12)
-              .fill(null)
-              .map((_, i) => <CardSkeleton key={i} />)
+          ? SKELETON_CARDS_ARRAY.map((_, i) => <CardSkeleton key={i} />)
           : filteredProducts?.map((product: Product) => (
               <Card key={product.id} product={product} />
             ))}

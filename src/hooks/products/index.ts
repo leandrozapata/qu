@@ -1,3 +1,4 @@
+import LoggerService from "@/libs/logger-service";
 import { useQuery } from "@tanstack/react-query";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "https://fakestoreapi.com";
@@ -14,11 +15,13 @@ export type Product = {
 };
 
 const getAllProducts = async () => {
-  const res = await fetch(`${baseURL}${getProductsPath}`);
-  if (!res.ok) {
-    throw new Error('Error fetching products');
+  try {
+    const res = await fetch(`${baseURL}${getProductsPath}`);
+    return res.json();
+  } catch (error: any) {
+    LoggerService.logError(error);
+    throw error;
   }
-  return res.json();
 };
 
 export const useProducts = () => {
